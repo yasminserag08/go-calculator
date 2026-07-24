@@ -8,46 +8,48 @@ func main() {
 	// infinite loop until user chooses to exit
 outer:
 	for {
-		var number1, number2 float64
-		fmt.Print("Enter the first number: ")
-		fmt.Scanln(&number1) // scanln is enough for now since no whitespaces are needed in the input
-		fmt.Print("Enter the second number: ")
-		fmt.Scanln(&number2)
+		displayMenu()
 
-		var operation string
-		fmt.Print("Enter operation (+, -, *, /): ")
-		fmt.Scanln(&operation)
+		var option int
+		fmt.Print("Choice: ")
+		fmt.Scanln(&option)
 
-		switch operation {
-		case "+":
-			fmt.Println("Result: ", number1+number2)
-		case "-":
-			fmt.Println("Result: ", number1-number2)
-		case "*":
-			fmt.Println("Result: ", number1*number2)
-		case "/":
-			if number2 == 0 {
-				fmt.Println("Error: Division by zero")
-				continue
-			}
-			fmt.Println("Result: ", number1/number2)
-		default:
-			fmt.Println("Invalid operation")
+		err := validateOption(option)
+
+		if err != nil {
+			fmt.Println(err)
 			continue
 		}
 
-		// after printing the result, ask the user if they want to exit
-		var choice string
-		fmt.Println("Do you want to exit? y / n")
-		fmt.Scanln(&choice)
+		switch option {
+		case 1:
+			var number1, number2 float64
+			fmt.Print("Enter the first number: ")
+			fmt.Scanln(&number1) // scanln is enough for now since no whitespaces are needed in the input
+			fmt.Print("Enter the second number: ")
+			fmt.Scanln(&number2)
 
-		switch choice {
-		case "y":
-			break outer
-		case "n":
+			var operation string
+			fmt.Print("Enter operation (+, -, *, /): ")
+			fmt.Scanln(&operation)
+
+			result, err := calculate(number1, number2, operation)
+
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			fmt.Println(result)
+		case 2:
+			// TODO
+			fmt.Println("View history - coming soon!")
 			continue
-		default:
-			fmt.Println("Invalid choice, continuing.") // if neither y or n, default is to continue
+		case 3:
+			// TODO
+			fmt.Println("Clear history - coming soon!")
+		case 4:
+			fmt.Println("Exiting...")
+			break outer
 		}
 	}
 }
