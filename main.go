@@ -2,6 +2,13 @@ package main
 
 import "fmt"
 
+type Calculation struct {
+	operand1  float64
+	operand2  float64
+	operation string
+	result    float64
+}
+
 func main() {
 	fmt.Println("Welcome to my simple calculator")
 
@@ -33,20 +40,26 @@ outer:
 			fmt.Print("Enter operation (+, -, *, /): ")
 			fmt.Scanln(&operation)
 
-			result, err := calculate(number1, number2, operation)
+			calc := Calculation{
+				number1,
+				number2,
+				operation,
+				0,
+			}
+
+			err := calculate(&calc)
 
 			if err != nil {
 				fmt.Println(err)
 				continue
 			}
-			fmt.Println(result)
+			fmt.Println(calc.result)
+			save(calc)
 		case 2:
-			// TODO
-			fmt.Println("View history - coming soon!")
+			viewHistory()
 			continue
 		case 3:
-			// TODO
-			fmt.Println("Clear history - coming soon!")
+			clearHistory()
 		case 4:
 			fmt.Println("Exiting...")
 			break outer

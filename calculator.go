@@ -2,20 +2,21 @@ package main
 
 import "fmt"
 
-func calculate(a, b float64, operation string) (float64, error) {
-	switch operation {
+func calculate(calc *Calculation) error {
+	switch calc.operation {
 	case "+":
-		return a + b, nil
+		calc.result = calc.operand1 + calc.operand2
 	case "-":
-		return a - b, nil
+		calc.result = calc.operand1 - calc.operand2
 	case "*":
-		return a * b, nil
+		calc.result = calc.operand1 * calc.operand2
 	case "/":
-		if b == 0 {
-			return 0, fmt.Errorf("cannot divide by zero")
+		if calc.operand2 == 0 {
+			return fmt.Errorf("cannot divide by zero")
 		}
-		return a / b, nil
+		calc.result = calc.operand1 / calc.operand2
 	default:
-		return 0, fmt.Errorf("invalid operation")
+		return fmt.Errorf("invalid operation")
 	}
+	return nil
 }
