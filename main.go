@@ -18,7 +18,7 @@ outer:
 		displayMenu()
 
 		var option int
-		fmt.Print("Choice: ")
+		fmt.Print("Option: ")
 		fmt.Scanln(&option)
 
 		err := validateOption(option)
@@ -53,7 +53,7 @@ outer:
 				fmt.Println(err)
 				continue
 			}
-			fmt.Println(calc.result)
+			fmt.Println("Result:", calc.result)
 			save(calc)
 		case 2:
 			viewHistory()
