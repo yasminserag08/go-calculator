@@ -6,13 +6,6 @@ import (
 	"os"
 )
 
-type Calculation struct {
-	operand1  float64
-	operand2  float64
-	operation string
-	result    float64
-}
-
 func main() {
 	fmt.Println("Welcome to my simple calculator")
 
@@ -41,7 +34,9 @@ outer:
 			if err != nil {
 				fmt.Println("an error occurred while reading the expression: ", err)
 			} else {
-				parse(input)
+				result := calculate(input)
+				fmt.Println("Result:", result)
+				save(HistoryEntry{input, result})
 			}
 
 		case 2:

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -20,11 +19,11 @@ var operatorFuncs = map[string]func(float64, float64) float64{
 	"-": subtract,
 }
 
-func parse(expression string) {
+func calculate(expression string) float64 {
 	tokens := tokenize(expression)
-	fmt.Println(tokens)
 	postfix := getPostfix(tokens)
-	fmt.Println(postfix)
+	result := computeResult(postfix)
+	return result
 }
 
 func tokenize(expression string) []string {
@@ -38,7 +37,6 @@ func getPostfix(tokens []string) []string {
 		if isOperator(token) {
 			// if operator in stack has higher precedence over token, pop it to output list first
 			for !isEmpty(operatorStack) && !precedes(token, peek(operatorStack)) {
-				fmt.Printf("%s precedes %s\n", token, peek(operatorStack))
 				outputList = append(outputList, pop(&operatorStack))
 			}
 			push(&operatorStack, token)
@@ -53,6 +51,23 @@ func getPostfix(tokens []string) []string {
 	}
 
 	return outputList
+}
+
+func computeResult(outputList []string) float64 {
+	var numberStack []float64
+	for _, item := range outputList {
+		if isNumber(item) {
+			push(&numberStack, float(item))
+		} else if isOperator(item) {
+			operand2 := pop(&numberStack)
+			operand1 := pop(&numberStack)
+			operation := operatorFuncs[item]
+			result := operation(operand1, operand2)
+			push(&numberStack, result)
+		}
+	}
+
+	return pop(&numberStack)
 }
 
 func divide(a, b float64) float64 {
@@ -81,7 +96,7 @@ func isOperator(token string) bool {
 	return ok
 }
 
-func push(stack *[]string, item string) {
+func push[T interface{}](stack *[]T, item T) {
 	*stack = append(*stack, item)
 }
 
@@ -89,11 +104,10 @@ func peek(stack []string) string {
 	return stack[len(stack)-1]
 }
 
-func pop(stack *[]string) string {
+func pop[T interface{}](stack *[]T) T {
 	last := len(*stack) - 1
 	item := (*stack)[last]
 	*stack = (*stack)[:last]
-	fmt.Printf("Popped %s\n", item)
 	return item
 }
 
@@ -103,4 +117,10 @@ func precedes(op1, op2 string) bool {
 
 func isEmpty(slice []string) bool {
 	return len(slice) == 0
+}
+
+func float(number string) float64 {
+	// ignored error because this func assumes that number has already been validated with isNumber
+	float, _ := strconv.ParseFloat(number, 64)
+	return float
 }
