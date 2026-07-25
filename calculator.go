@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 var operatorPrecedence = map[string]int{
@@ -31,11 +30,6 @@ func calculate(expression string) (float64, error) {
 		return 0, err
 	}
 	return result, nil
-}
-
-func tokenize(expression string) []string {
-	expression = padExpression(expression)
-	return strings.Fields(expression)
 }
 
 func getPostfix(tokens []string) ([]string, error) {
@@ -144,30 +138,4 @@ func float(number string) float64 {
 	// ignored error because this func assumes that number has already been validated with isNumber
 	num, _ := strconv.ParseFloat(number, 64)
 	return num
-}
-
-func padExpression(expression string) string {
-	var sb strings.Builder
-
-	for i := 0; i < len(expression); i++ {
-		char := expression[i]
-
-		// if operator or parenthesis, pad with spaces
-		switch char {
-		case '+', '-', '*', '/', '(', ')':
-			// add space if operator doesn't have space before it
-			if sb.Len() > 0 && sb.String()[sb.Len()-1] != ' ' {
-				sb.WriteByte(' ')
-			}
-			sb.WriteByte(char)
-			// add space if operator doesn't have space after it
-			if i+1 < len(expression) && expression[i+1] != ' ' {
-				sb.WriteByte(' ')
-			}
-		default:
-			sb.WriteByte(char)
-		}
-	}
-
-	return sb.String()
 }
