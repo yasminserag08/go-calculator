@@ -43,19 +43,36 @@ func getPostfix(tokens []string) ([]string, error) {
 	for _, token := range tokens {
 		if isOperator(token) {
 			// if operator in stack has higher precedence over token, pop it to output list first
-			for !isEmpty(operatorStack) && !precedes(token, peek(operatorStack)) {
+			for !isEmpty(operatorStack) && peek(operatorStack) != "(" && !precedes(token, peek(operatorStack)) {
 				outputList = append(outputList, pop(&operatorStack))
 			}
 			push(&operatorStack, token)
 		} else if isNumber(token) {
 			outputList = append(outputList, token)
+		} else if token == "(" {
+			push(&operatorStack, token)
+		} else if token == ")" {
+			for !isEmpty(operatorStack) && peek(operatorStack) != "(" {
+				outputList = append(outputList, pop(&operatorStack))
+			}
+
+			if isEmpty(operatorStack) {
+				return nil, fmt.Errorf("mismatched parentheses: missing '('")
+			}
+
+			pop(&operatorStack)
 		} else {
 			return nil, fmt.Errorf("invalid token: %s", token)
 		}
+
 	}
 
 	// add any remaining operators to the output list
 	for !isEmpty(operatorStack) {
+		if peek(operatorStack) == "(" {
+			return nil, fmt.Errorf("mismatched parentheses: missing ')'")
+		}
+
 		outputList = append(outputList, pop(&operatorStack))
 	}
 
