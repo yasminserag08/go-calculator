@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
 
 type Calculation struct {
 	operand1  float64
@@ -30,31 +34,16 @@ outer:
 
 		switch option {
 		case 1:
-			var number1, number2 float64
-			fmt.Print("Enter the first number: ")
-			fmt.Scanln(&number1) // scanln is enough for now since no whitespaces are needed in the input
-			fmt.Print("Enter the second number: ")
-			fmt.Scanln(&number2)
-
-			var operation string
-			fmt.Print("Enter operation (+, -, *, /): ")
-			fmt.Scanln(&operation)
-
-			calc := Calculation{
-				number1,
-				number2,
-				operation,
-				0,
-			}
-
-			err := calculate(&calc)
+			reader := bufio.NewReader(os.Stdin)
+			fmt.Print("Enter expression: ")
+			input, err := reader.ReadString('\n')
 
 			if err != nil {
-				fmt.Println(err)
-				continue
+				fmt.Println("an error occurred while reading the expression: ", err)
+			} else {
+				parse(input)
 			}
-			fmt.Println("Result:", calc.result)
-			save(calc)
+
 		case 2:
 			viewHistory()
 			continue
