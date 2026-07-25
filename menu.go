@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 func displayMenu() {
 	fmt.Println("*********************************")
@@ -12,9 +15,16 @@ func displayMenu() {
 	fmt.Println("*********************************")
 }
 
-func validateOption(option int) error {
-	if option < 1 || option > 4 {
-		return fmt.Errorf("invalid option")
+func validateOption(option string) error {
+
+	optionInt, err := strconv.Atoi(option)
+	if err != nil {
+		return fmt.Errorf("invalid option: please enter a number")
 	}
+
+	if optionInt < 1 || optionInt > 4 {
+		return fmt.Errorf("invalid option: choose between 1 and 4")
+	}
+
 	return nil
 }

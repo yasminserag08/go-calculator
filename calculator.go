@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -12,25 +13,31 @@ var operatorPrecedence = map[string]int{
 	"-": 1,
 }
 
-var operatorFuncs = map[string]func(float64, float64) float64{
+var operatorFuncs = map[string]func(float64, float64) (float64, error){
 	"*": multiply,
 	"/": divide,
 	"+": add,
 	"-": subtract,
 }
 
-func calculate(expression string) float64 {
+func calculate(expression string) (float64, error) {
 	tokens := tokenize(expression)
-	postfix := getPostfix(tokens)
-	result := computeResult(postfix)
-	return result
+	postfix, err := getPostfix(tokens)
+	if err != nil {
+		return 0, err
+	}
+	result, err := computeResult(postfix)
+	if err != nil {
+		return 0, err
+	}
+	return result, nil
 }
 
 func tokenize(expression string) []string {
 	return strings.Fields(expression)
 }
 
-func getPostfix(tokens []string) []string {
+func getPostfix(tokens []string) ([]string, error) {
 	var outputList []string
 	var operatorStack []string
 	for _, token := range tokens {
@@ -42,6 +49,8 @@ func getPostfix(tokens []string) []string {
 			push(&operatorStack, token)
 		} else if isNumber(token) {
 			outputList = append(outputList, token)
+		} else {
+			return nil, fmt.Errorf("invalid token: %s", token)
 		}
 	}
 
@@ -50,40 +59,53 @@ func getPostfix(tokens []string) []string {
 		outputList = append(outputList, pop(&operatorStack))
 	}
 
-	return outputList
+	return outputList, nil
 }
 
-func computeResult(outputList []string) float64 {
+func computeResult(outputList []string) (float64, error) {
 	var numberStack []float64
 	for _, item := range outputList {
 		if isNumber(item) {
 			push(&numberStack, float(item))
 		} else if isOperator(item) {
+			if len(numberStack) < 2 {
+				return 0, fmt.Errorf("malformed expression: missing numbers for operator %s", item)
+			}
 			operand2 := pop(&numberStack)
 			operand1 := pop(&numberStack)
 			operation := operatorFuncs[item]
-			result := operation(operand1, operand2)
+			result, err := operation(operand1, operand2)
+			if err != nil {
+				return 0, err
+			}
 			push(&numberStack, result)
 		}
 	}
 
-	return pop(&numberStack)
+	if len(numberStack) != 1 {
+		return 0, fmt.Errorf("malformed expression")
+	}
+
+	return pop(&numberStack), nil
 }
 
-func divide(a, b float64) float64 {
-	return a / b
+func divide(a, b float64) (float64, error) {
+	if b == 0 {
+		return 0, fmt.Errorf("division by zero")
+	}
+	return a / b, nil
 }
 
-func multiply(a, b float64) float64 {
-	return a * b
+func multiply(a, b float64) (float64, error) {
+	return a * b, nil
 }
 
-func add(a, b float64) float64 {
-	return a + b
+func add(a, b float64) (float64, error) {
+	return a + b, nil
 }
 
-func subtract(a, b float64) float64 {
-	return a - b
+func subtract(a, b float64) (float64, error) {
+	return a - b, nil
 }
 
 func isNumber(token string) bool {
@@ -121,6 +143,6 @@ func isEmpty(slice []string) bool {
 
 func float(number string) float64 {
 	// ignored error because this func assumes that number has already been validated with isNumber
-	float, _ := strconv.ParseFloat(number, 64)
-	return float
+	num, _ := strconv.ParseFloat(number, 64)
+	return num
 }
