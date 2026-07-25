@@ -14,10 +14,12 @@ A command-line calculator written in Go. It handles operator precedence and nest
 
 ## Project Structure
 
-* `calculator.go` — Contains the core mathematical parsing engine, infix to postfix conversion, postfix evaluation, and operation logic.
+* `calculator.go` — Contains infix to postfix conversion, postfix evaluation, and operation logic.
 * `history.go` — Manages storage, viewing, and clearing of past calculation sessions.
-* `main.go` — Handles the main application control flow and user input loop.
 * `menu.go` — Handles menu rendering and user choice validation.
+* `parsing.go` — Manages tokenization and expression normalization.
+* `stack.go` — Contains all generic stack operations.
+* `main.go` — Handles the main application control flow and user input loop.
 
 ---
 
