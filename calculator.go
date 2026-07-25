@@ -34,6 +34,7 @@ func calculate(expression string) (float64, error) {
 }
 
 func tokenize(expression string) []string {
+	expression = padExpression(expression)
 	return strings.Fields(expression)
 }
 
@@ -135,31 +136,38 @@ func isOperator(token string) bool {
 	return ok
 }
 
-func push[T interface{}](stack *[]T, item T) {
-	*stack = append(*stack, item)
-}
-
-func peek(stack []string) string {
-	return stack[len(stack)-1]
-}
-
-func pop[T interface{}](stack *[]T) T {
-	last := len(*stack) - 1
-	item := (*stack)[last]
-	*stack = (*stack)[:last]
-	return item
-}
-
 func precedes(op1, op2 string) bool {
 	return operatorPrecedence[op1] > operatorPrecedence[op2]
-}
-
-func isEmpty(slice []string) bool {
-	return len(slice) == 0
 }
 
 func float(number string) float64 {
 	// ignored error because this func assumes that number has already been validated with isNumber
 	num, _ := strconv.ParseFloat(number, 64)
 	return num
+}
+
+func padExpression(expression string) string {
+	var sb strings.Builder
+
+	for i := 0; i < len(expression); i++ {
+		char := expression[i]
+
+		// if operator or parenthesis, pad with spaces
+		switch char {
+		case '+', '-', '*', '/', '(', ')':
+			// add space if operator doesn't have space before it
+			if sb.Len() > 0 && sb.String()[sb.Len()-1] != ' ' {
+				sb.WriteByte(' ')
+			}
+			sb.WriteByte(char)
+			// add space if operator doesn't have space after it
+			if i+1 < len(expression) && expression[i+1] != ' ' {
+				sb.WriteByte(' ')
+			}
+		default:
+			sb.WriteByte(char)
+		}
+	}
+
+	return sb.String()
 }
